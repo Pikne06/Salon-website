@@ -1,3 +1,4 @@
+
 # Salon Booking Website
 
 A Flask-based appointment booking web application for a nail, hairstylist, or barber salon. It handles client-facing booking and account management, plus a full admin panel for running the business side of the salon. Ships pre-configured as a demo salon ("Auraline Salon") — the business name, contact info, colors, and fonts are all editable from the admin panel without touching code.
@@ -34,26 +35,6 @@ A Flask-based appointment booking web application for a nail, hairstylist, or ba
 - **Backend:** Python, Flask
 - **Database:** SQLite
 - **Frontend:** HTML/CSS/JS (Jinja2 templates)
-
-## Project structure
-
-```
-Salon-website/
-├── app.py              # Flask application entry point, all routes
-├── auth.py             # Registration, login, password management
-├── appointments.py     # Booking logic, availability/overlap checks
-├── services.py         # Service CRUD
-├── db.py                # Database connection + schema/migrations
-├── init_db.py            # Standalone DB initialization script
-├── utils.py              # Password hashing, validation, token helpers
-├── requirements.txt
-├── templates/           # HTML pages (client + admin)
-└── static/
-    ├── css/
-    ├── js/
-    ├── images/
-    └── hairsal/          # fonts
-```
 
 ## Getting started
 
