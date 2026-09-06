@@ -1,4 +1,3 @@
-[README_1.md](https://github.com/user-attachments/files/31882695/README_1.md)
 # Salon Booking Website
 
 A Flask-based appointment booking web application for a nail, hairstylist, or barber salon. It handles client-facing booking and account management, plus a full admin panel for running the business side of the salon. Ships pre-configured as a demo salon ("Auraline Salon") — the business name, contact info, colors, and fonts are all editable from the admin panel without touching code.
