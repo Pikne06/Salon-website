@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="{{ site_tagline }}" />
+    <title>{{ title or (site_name ~ ' | ' ~ site_tagline) }}</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/logo-mark.svg') }}">
+    {# Using local/system fonts to satisfy strict CSP; remove external Google Fonts link #}
+    <!-- Vendor CSS (local copies) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='hairsal/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='hairsal/css/owl.carousel.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='hairsal/css/magnific-popup.css') }}">
+    {# jquery-ui CSS not present in assets; removed to avoid 404/mime issues #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='hairsal/css/aos.css') }}">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+    <!-- Hairsal theme additions -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='hairsal/css/style.css') }}" />
+    <style>
+      :root {
+        /* Refined default palette (overridable via site_settings) */
+          --primary: {{ site_settings.theme_primary if site_settings else '#2563EB' }}; /* Indigo */
+          --primary-2: {{ site_settings.theme_secondary if site_settings else '#0EA5A4' }}; /* Teal */
+          /* Force safe, light defaults for background and cards to avoid accidental dark/red themes */
+          --background: {{ site_settings.background_color if site_settings and site_settings.background_color not in ['#0a0a0b', '#000000'] else '#FAF5EA' }}; /* Light beige */
+          --card-bg: {{ site_settings.card_background if site_settings and site_settings.card_background not in ['#ff0000', '#000000'] else '#FFFFFF' }};
+          --text: {{ site_settings.text_color if site_settings else '#0F172A' }}; /* Dark slate */
+        --body-font: {{ site_settings.body_font if site_settings else 'Inter, sans-serif' }};
+        --heading-font: {{ site_settings.heading_font if site_settings else 'Fraunces, serif' }};
+      }
+      /* Small accessibility tweak: ensure link/button focus outlines use primary color */
+      :focus {
+        outline-color: var(--primary-2);
+        outline-style: solid;
+      }
+      /* Keep header and colors fixed to avoid shifting during scroll */
+      .site-header { position: sticky; top: 0; z-index: 2000; background: var(--background); overflow: visible; }
+      .site-nav { display:flex; align-items:center; gap:16px; }
+      .site-nav .brand { flex: 0 0 auto; }
+      .site-nav .nav-links { flex: 1 1 auto; }
+      .site-nav .nav-actions { flex: 0 0 auto; }
+      .nav-menu-panel { z-index: 1100; }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="nav-wrap">
+        <nav class="site-nav container">
+          <a href="{{ url_for('index') }}" class="brand" aria-label="{{ site_name }} home">
+            <img src="{{ url_for('static', filename='images/logo-mark.svg') }}" alt="{{ site_name }}" class="brand-mark" />
+            <span class="brand-copy">
+              <img src="{{ url_for('static', filename='images/logo-full.svg') }}" alt="{{ site_name }}" class="brand-wordmark" />
+            </span>
+          </a>
+          <div class="nav-links">
+            <a href="{{ url_for('gallery') }}">Gallery</a>
+            <a href="{{ url_for('stylists_page') }}">Stylists</a>
+            <a href="{{ url_for('faq') }}">FAQ</a>
+          </div>
+          <div class="nav-actions">
+            <div class="nav-menu">
+              <button class="button primary nav-menu-trigger" type="button" aria-expanded="false" aria-controls="nav-menu-panel">Menu ▾</button>
+              <div id="nav-menu-panel" class="nav-menu-panel">
+                <a href="{{ url_for('services_page') }}">Services</a>
+                <a href="{{ url_for('stylists_page') }}">Stylists</a>
+                <a href="{{ url_for('book') }}">Book Online</a>
+                {% if current_user %}
+                <a href="{{ url_for('profile') }}">Account</a>
+                <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                {% if is_admin %}
+                <div class="menu-section">Admin</div>
+                <a href="{{ url_for('manage_services') }}">Services</a>
+                <a href="{{ url_for('manage_technicians') }}">Technicians</a>
+                <a href="{{ url_for('admin_availability') }}">Availability</a>
+                <a href="{{ url_for('admin_waitlist') }}">Waitlist</a>
+                <a href="{{ url_for('admin_gallery') }}">Gallery</a>
+                <a href="{{ url_for('admin_reviews') }}">Reviews</a>
+                <a href="{{ url_for('admin_settings') }}">Settings</a>
+                {% endif %}
+                <a class="menu-logout" href="{{ url_for('logout') }}">Logout</a>
+                {% else %}
+                <a class="button secondary" href="{{ url_for('login') }}">Log in</a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    {% block hero %}{% endblock %}
+
+    <main class="page-content container">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div class="alerts">
+        {% for category, message in messages %}
+        <div class="alert {{ category }}">
+          <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endwith %}
+
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <div class="footer-left">
+          <strong>{{ site_name }}</strong>
+          <div class="site-contact">
+            <a class="maps-button" href="{{ site_settings.maps_url if site_settings else '#' }}" target="_blank">Open on map</a>
+            {% if site_settings and site_settings.phone %}
+            <span class="phone">{{ site_settings.phone }}</span>
+            {% endif %}
+          </div>
+        </div>
+        <div class="footer-right">
+          <div class="social-links">
+            {% set instagram_url = site_settings.instagram_url if site_settings and site_settings.instagram_url else 'https://instagram.com/' %}
+            {% set facebook_url = site_settings.facebook_url if site_settings and site_settings.facebook_url else 'https://facebook.com/' %}
+            <a href="{{ instagram_url }}" target="_blank" aria-label="Instagram" class="social-link">
+              <svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="4" y="4" width="16" height="16" rx="4" ry="4" fill="none" stroke="currentColor" stroke-width="1.6" />
+                <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.6" />
+                <circle cx="17" cy="7" r="1.2" fill="currentColor" />
+              </svg>
+              <span>Instagram</span>
+            </a>
+            <a href="{{ facebook_url }}" target="_blank" aria-label="Facebook" class="social-link">
+              <svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M14 8h3V5h-3c-2 0-4 1.8-4 4v2H7v3h3v6h3v-6h3l1-3h-4V9c0-.6.4-1 1-1z" fill="currentColor" />
+              </svg>
+              <span>Facebook</span>
+            </a>
+            {% if site_settings and site_settings.tiktok_url %}
+            <a href="{{ site_settings.tiktok_url }}" target="_blank" aria-label="TikTok" class="social-link">
+              <span>TikTok</span>
+            </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </footer>
+  </body>
+  <script src="{{ url_for('static', filename='hairsal/js/jquery-3.3.1.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='hairsal/js/owl.carousel.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='hairsal/js/jquery.countdown.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='hairsal/js/jquery.magnific-popup.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='hairsal/js/aos.js') }}"></script>
+
+  <script src="{{ url_for('static', filename='hairsal/js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/site-fixes.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/time-steps.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/countdown.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/before-after.js') }}"></script>
+</html>

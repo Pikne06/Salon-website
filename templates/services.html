@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block hero %}
+<section class="page-hero container compact">
+  <h1>Services</h1>
+</section>
+{% endblock %}
+
+{% block content %}
+  <div class="site-section">
+    <div class="container">
+      {% if services %}
+      <div class="services-grid services-grid--template">
+        {% for s in services %}
+        <a class="service-card--template" href="{{ url_for('service_detail', service_id=s.id) }}" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 60 }}">
+          <div class="service-card__media">
+            {% if s.image_url %}
+            <img src="{{ s.image_url }}" alt="{{ s.name }}" loading="lazy" />
+            {% else %}
+            <div class="service-card__placeholder"></div>
+            {% endif %}
+          </div>
+          <div class="service-card__body">
+            <div>
+              <h3>{{ s.name }}</h3>
+              <p>{{ s.duration }}-minute session</p>
+            </div>
+            <strong>${{ '%.2f'|format(s.price if s.price is not none else 0) }}</strong>
+          </div>
+          <div class="service-card__reveal">
+            {{ s.description or 'Tap to see full details, add-ons, and aftercare.' }}
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p>No services yet. Add one in the admin area.</p>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

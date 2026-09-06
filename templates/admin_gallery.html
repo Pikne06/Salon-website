@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-4">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-gallery.css') }}">
+  <h2>Gallery Manager</h2>
+  <p>Upload images for the public gallery or manage existing photos.</p>
+  <p class="small text-muted">Keyboard: focus a thumbnail then press <strong>Space</strong> to pick up, <strong>Arrow Up/Down</strong> to move, <strong>Enter</strong> to drop.</p>
+  <form method="post" enctype="multipart/form-data">
+  <div class="d-flex align-items-center mb-3">
+    <form method="get" class="me-3">
+      <label class="form-label me-2">Filter</label>
+      <select name="service_id" class="form-select" onchange="this.form.submit()">
+        <option value="all" {% if selected_service == 'all' %}selected{% endif %}>All photos</option>
+        <option value="none" {% if selected_service == 'none' %}selected{% endif %}>General (no service)</option>
+        {% for s in services %}
+        <option value="{{ s[0] }}" {% if selected_service|string == s[0]|string %}selected{% endif %}>Service: {{ s[1] }}</option>
+        {% endfor %}
+      </select>
+    </form>
+    <div class="ms-auto text-end">
+      <small class="text-muted">Selected: {% if selected_service == 'all' %}All{% elif selected_service == 'none' %}General{% else %}Service {{ selected_service }}{% endif %}</small>
+    </div>
+  </div>
+
+  <form method="post" enctype="multipart/form-data">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="hidden" name="action" value="upload">
+  {# default uploads to the currently-selected service; when 'all' treat as 'none' #}
+  <input type="hidden" name="service_id" value="{% if selected_service and selected_service != 'all' %}{{ selected_service }}{% else %}none{% endif %}">
+    <div class="mb-3">
+      <label class="form-label">Technician (optional)</label>
+      <select class="form-select" name="technician_id">
+        <option value="">Unassigned</option>
+        {% for tech in technicians %}
+        <option value="{{ tech[0] }}">{{ tech[1] }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Select photos</label>
+      <input class="form-control" type="file" name="photos" multiple accept="image/*">
+    </div>
+    <button class="btn btn-primary" type="submit">Upload</button>
+  </form>
+
+  <hr>
+  <h3>Existing Photos</h3>
+  <div class="row" id="gallery-photos" role="list">
+    {% for p in photos %}
+    <div class="col-md-3 mb-3 gallery-card" draggable="true" data-id="{{ p['id'] }}" tabindex="0" role="listitem" aria-grabbed="false">
+      <div class="card">
+        <div style="height:160px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#f7f7f7;position:relative;">
+          <img src="{{ p['image_url'] }}" class="card-img-top" style="max-height:160px;width:auto;object-fit:cover;" alt="photo">
+          <span class="drag-handle" title="Drag to reorder">☰</span>
+        </div>
+        <div class="card-body">
+          <form method="post" class="d-flex mb-2">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="action" value="edit_caption">
+            <input type="hidden" name="photo_id" value="{{ p['id'] }}">
+            <input name="caption" class="form-control me-2" value="{{ p['caption'] or '' }}" placeholder="Caption">
+            <button class="btn btn-sm btn-outline-primary" type="submit">Save</button>
+          </form>
+          <form method="post" class="mb-2">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="action" value="update_technician">
+            <input type="hidden" name="photo_id" value="{{ p['id'] }}">
+            <div class="input-group input-group-sm">
+              <select class="form-select" name="technician_id">
+                <option value="">Unassigned</option>
+                {% for tech in technicians %}
+                <option value="{{ tech[0] }}" {% if p['technician_id'] and tech[0] == p['technician_id'] %}selected{% endif %}>{{ tech[1] }}</option>
+                {% endfor %}
+              </select>
+              <button class="btn btn-sm btn-outline-secondary" type="submit">Save</button>
+            </div>
+          </form>
+          {% if p['technician_name'] %}
+          <div class="small text-muted mb-2">By {{ p['technician_name'] }}</div>
+          {% endif %}
+          <div class="d-flex justify-content-between">
+            <form method="post">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="action" value="remove_photo">
+              <input type="hidden" name="photo_id" value="{{ p['id'] }}">
+              <button class="btn btn-sm btn-danger" type="submit">Remove</button>
+            </form>
+            <span class="text-muted small align-self-center drag-hint">⇅ drag</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <script src="{{ url_for('static', filename='js/admin-gallery.js') }}"></script>
+</div>
+{% endblock %}

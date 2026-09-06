@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block hero %}
+<section class="page-hero container compact">
+  <h1>Stylists</h1>
+  <p class="section-note">Meet the team and book with a stylist who fits your style.</p>
+</section>
+{% endblock %}
+
+{% block content %}
+<section class="section container">
+  {% if stylists %}
+  <div class="stylist-list-grid">
+    {% for s in stylists %}
+    <article class="card stylist-card-large">
+      <div class="stylist-card__media">
+        {% if s['photo_url'] %}
+        <img src="{{ s['photo_url'] }}" alt="{{ s['name'] }}" />
+        {% else %}
+        <div class="stylist-placeholder"></div>
+        {% endif %}
+      </div>
+      <div class="stylist-card__body">
+        <div>
+          <h2>{{ s['name'] }}</h2>
+          <div class="muted">{{ s['title'] or 'Stylist' }}</div>
+          {% if s['specialties'] %}<div class="pill">{{ s['specialties'] }}</div>{% endif %}
+          {% if s['bio'] %}<p class="muted">{{ s['bio']|truncate(160, True) }}</p>{% endif %}
+        </div>
+        <div class="stylist-card__actions">
+          <a class="button secondary" href="{{ url_for('stylist_profile', technician_id=s['id']) }}">View profile</a>
+          <a class="button" href="{{ url_for('book') }}?technician_id={{ s['id'] }}">Book with {{ s['name'] }}</a>
+        </div>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p>No stylists available yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

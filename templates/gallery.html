@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block hero %}
+<section class="page-hero container compact">
+  <h1>Gallery</h1>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="site-section">
+  <div class="container">
+    {% if before_after_pairs %}
+    <section class="card service-panel" data-aos="fade-up">
+      <div class="review-header">
+        <h2>Before / After</h2>
+        <span class="muted">Drag the slider to compare</span>
+      </div>
+      <div class="before-after-grid">
+        {% for pair in before_after_pairs %}
+        <div class="before-after" style="--position: 50%;">
+          <img src="{{ pair.before_url }}" alt="Before {{ pair.label }}" />
+          <div class="before-after__after">
+            <img src="{{ pair.after_url }}" alt="After {{ pair.label }}" />
+          </div>
+          <div class="before-after__handle"></div>
+          <input class="before-after__range" type="range" min="0" max="100" value="50" aria-label="Before and after slider" />
+          {% if pair.label %}<div class="before-after__label">{{ pair.label }}</div>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      <p class="muted" style="margin:0;">Tip: label captions as “Before” and “After” for a service to build a slider.</p>
+    </section>
+    {% endif %}
+
+    <div class="service-detail-grid" data-aos="fade-up">
+      <section class="card service-panel">
+        <h2>Gallery</h2>
+        {% if images %}
+        <div class="gallery-grid">
+          {% for img in images %}
+          <figure class="gallery-item" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 40 }}">
+            <a href="{{ img.url or img }}" class="image-popup"><img src="{{ img.url or img }}" alt="Gallery image" loading="lazy" /></a>
+            {% if img.caption or img.by %}
+            <figcaption>{{ img.caption or '' }}{% if img.by %} — by {{ img.by }}{% endif %}</figcaption>
+            {% endif %}
+          </figure>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p>No images yet. Upload some in Admin - Gallery.</p>
+        {% endif %}
+      </section>
+
+      <section class="card service-panel" data-aos="fade-up">
+        <div class="review-header">
+          <h2>Latest reviews</h2>
+          <a class="button secondary" href="{{ url_for('services_page') }}">Browse services</a>
+        </div>
+        {% if rating_total %}
+        <div class="rating-summary">
+          <div class="rating-average">
+            <strong>{{ rating_avg }}/5</strong>
+            <span class="muted">{{ rating_total }} reviews</span>
+          </div>
+          <div class="rating-bars">
+            {% for row in rating_summary %}
+            <div class="rating-row">
+              <span>{{ row['rating'] }}/5</span>
+              <div class="rating-bar"><span style="width: {{ (row['count'] / rating_total * 100) if rating_total else 0 }}%"></span></div>
+              <span class="muted">{{ row['count'] }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+        {% if reviews %}
+        <div class="review-list">
+          {% for r in reviews %}
+          <div class="review-card" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 60 }}">
+            <div class="review-meta">
+              <strong>{{ r['username'] or 'Guest' }}</strong>
+              <span class="muted">{{ r['rating'] }}/5</span>
+            </div>
+            {% if r['service_name'] %}<div class="muted">{{ r['service_name'] }}</div>{% endif %}
+            <div>{{ r['comment'] }}</div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p>No reviews yet. Book a service and share your experience.</p>
+        {% endif %}
+      </section>
+    </div>
+  </div>
+</div>
+{% endblock %}

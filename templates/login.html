@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block hero %}
+<section class="page-hero container compact">
+  <h1>Welcome back - let's keep your day easy.</h1>
+</section>
+{% endblock %}
+
+{% block content %}
+<section class="auth-grid auth-grid-single">
+  <article class="form-panel">
+    <h2>Sign in</h2>
+    <form method="post" class="form-grid">
+      {% if csrf_token %}
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      {% endif %}
+      <div class="input-group">
+        <label for="username">Username</label>
+        <input id="username" name="username" type="text" required autofocus />
+      </div>
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" required />
+      </div>
+      <button type="submit" class="button">Sign in</button>
+    </form>
+  </article>
+</section>
+{% endblock %}

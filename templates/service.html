@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block hero %}
+<section class="page-hero container compact">
+  <h1>{{ service.name }}</h1>
+</section>
+{% endblock %}
+
+{% block content %}
+<section class="section container">
+  <div class="service-detail-grid">
+    <article class="card service-summary">
+      <div class="service-summary__header">
+        <div>
+          <h2>{{ service.name }}</h2>
+          {% if service.description %}
+          <p class="muted">{{ service.description }}</p>
+          {% else %}
+          <p class="muted">A focused session tailored to your goals.</p>
+          {% endif %}
+        </div>
+        <div class="service-price">
+          <strong>${{ '%.2f'|format(service.price) }}</strong>
+          <span class="muted">{{ service.duration }} minutes</span>
+        </div>
+      </div>
+      <div class="service-meta">
+        <div>
+          <h3>Includes</h3>
+          {% if service.includes_text %}
+          <p>{{ service.includes_text }}</p>
+          {% else %}
+          <p class="muted">Consultation, tailored prep, and styling finish.</p>
+          {% endif %}
+        </div>
+        <div>
+          <h3>Aftercare</h3>
+          {% if service.aftercare_text %}
+          <p>{{ service.aftercare_text }}</p>
+          {% else %}
+          <p class="muted">We will send personalized maintenance tips after your visit.</p>
+          {% endif %}
+        </div>
+      </div>
+      <div class="service-cta">
+        <a class="button" href="{{ url_for('book') }}">Book this service</a>
+      </div>
+    </article>
+
+    <article class="card service-panel">
+      <h3>Stylist team</h3>
+      {% if stylists %}
+      <div class="stylist-grid">
+        {% for stylist in stylists %}
+        <div class="stylist-card">
+          <div class="stylist-avatar">
+            {% if stylist[3] %}
+            <img src="{{ stylist[3] }}" alt="{{ stylist[1] }}" />
+            {% else %}
+            <div class="stylist-placeholder"></div>
+            {% endif %}
+          </div>
+          <div>
+            <strong><a class="stylist-link" href="{{ url_for('stylist_profile', technician_id=stylist[0]) }}">{{ stylist[1] }}</a></strong>
+            <div class="muted">{{ stylist[2] or 'Stylist' }}</div>
+            {% if stylist[4] %}<div class="pill">{{ stylist[4] }}</div>{% endif %}
+            {% if stylist[5] %}<p class="muted">{{ stylist[5] }}</p>{% endif %}
+            <div class="stylist-actions">
+              <a href="{{ url_for('stylist_profile', technician_id=stylist[0]) }}">View profile</a>
+              <a href="{{ url_for('book') }}?technician_id={{ stylist[0] }}">Book with {{ stylist[1] }}</a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p>No stylists listed yet.</p>
+      {% endif %}
+    </article>
+  </div>
+</section>
+
+<section class="section container">
+  <div class="service-detail-grid">
+    <article class="card service-panel">
+      <h3>Service gallery</h3>
+      {% if service.image_url or photos %}
+      <div class="gallery-grid">
+        {% if service.image_url %}
+        <figure class="gallery-item" data-aos="fade-up" data-aos-delay="0">
+          <img src="{{ service.image_url }}" alt="{{ service.name }}" />
+        </figure>
+        {% endif %}
+        {% for p in photos %}
+        <figure class="gallery-item" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 50 }}">
+          <img src="{{ p.image_url }}" alt="{{ service.name }}" />
+          {% if p.caption or p.technician_name %}
+          <figcaption>{{ p.caption or '' }}{% if p.technician_name %} — by {{ p.technician_name }}{% endif %}</figcaption>
+          {% endif %}
+        </figure>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p>No gallery images yet.</p>
+      {% endif %}
+    </article>
+
+    <article class="card service-panel">
+      <div class="review-header">
+        <h3>Client notes</h3>
+        {% if avg_rating %}
+        <span class="rating-badge">{{ avg_rating }}/5 · {{ review_count }} reviews</span>
+        {% endif %}
+      </div>
+      <div class="review-list">
+        {% for r in reviews %}
+        <div class="review-card" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 60 }}">
+          <div class="review-meta">
+            <strong>{{ r.username }}</strong>
+            <span class="muted">{{ r.rating }}/5</span>
+          </div>
+          <div>{{ r.comment }}</div>
+        </div>
+        {% else %}
+        <p>No reviews yet. Be the first to share.</p>
+        {% endfor %}
+      </div>
+
+      {% if current_user %}
+      <form method="post" class="form-grid" style="margin-top:1rem;">
+        {% if csrf_token %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />{% endif %}
+        <input type="hidden" name="action" value="add_review" />
+        <div class="input-group">
+          <label for="rating">Rating</label>
+          <select id="rating" name="rating">
+            {% for i in range(5,0,-1) %}
+            <option value="{{ i }}">{{ i }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="comment">Comment</label>
+          <textarea id="comment" name="comment" rows="3"></textarea>
+        </div>
+        <button type="submit" class="button">Submit review</button>
+      </form>
+      {% else %}
+      <p><a href="{{ url_for('login') }}">Sign in</a> to leave a review.</p>
+      {% endif %}
+    </article>
+  </div>
+</section>
+{% endblock %}

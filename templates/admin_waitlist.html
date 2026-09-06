@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block hero %}
+<section class="page-hero container compact">
+  <h1>Waitlist</h1>
+</section>
+{% endblock %}
+
+{% block content %}
+<section class="card">
+  <h2>Requests</h2>
+  {% if waitlist %}
+  <div class="waitlist-list">
+    {% for w in waitlist %}
+    <div class="waitlist-row">
+      <div>
+        <strong>{{ w['name'] or 'Guest' }}</strong>
+        <div class="muted">{{ w['email'] or '' }} {{ w['phone'] or '' }}</div>
+        <div class="muted">
+          {{ w['service_name'] or 'Any service' }} · {{ w['technician_name'] or 'Any technician' }}
+        </div>
+        <div class="muted">Preferred: {{ w['preferred_date'] or 'Any date' }} {{ w['preferred_time'] or '' }}</div>
+        {% if w['notes'] %}<div class="muted">{{ w['notes'] }}</div>{% endif %}
+      </div>
+      <div class="waitlist-actions">
+        <span class="chip muted-chip">{{ w['status'] }}</span>
+        <form method="post">
+          {% if csrf_token %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />{% endif %}
+          <input type="hidden" name="wait_id" value="{{ w['id'] }}" />
+          <input type="hidden" name="action" value="contacted" />
+          <button type="submit" class="button secondary">Contacted</button>
+        </form>
+        <form method="post">
+          {% if csrf_token %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />{% endif %}
+          <input type="hidden" name="wait_id" value="{{ w['id'] }}" />
+          <input type="hidden" name="action" value="booked" />
+          <button type="submit" class="button secondary">Booked</button>
+        </form>
+        <form method="post">
+          {% if csrf_token %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />{% endif %}
+          <input type="hidden" name="wait_id" value="{{ w['id'] }}" />
+          <input type="hidden" name="action" value="closed" />
+          <button type="submit" class="button secondary">Close</button>
+        </form>
+        <form method="post">
+          {% if csrf_token %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />{% endif %}
+          <input type="hidden" name="wait_id" value="{{ w['id'] }}" />
+          <input type="hidden" name="action" value="remove" />
+          <button type="submit" class="button secondary">Remove</button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p>No waitlist entries yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

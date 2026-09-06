@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Delete Account</h2>
+<p>Warning: This action is irreversible!</p>
+<form method="POST">
+    {% if csrf_token %}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    {% endif %}
+    <label>Confirm your password:</label>
+    <input type="password" name="password" required>
+    
+    <button type="submit" style="background-color:#e84118;">Delete Account</button>
+</form>
+<p><a href="{{ url_for('manage') }}">Back to Manage Account</a></p>
+{% endblock %}

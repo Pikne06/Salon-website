@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block hero %}
+<div>
+  <h1 style="font-size: clamp(2rem, 4vw, 3.25rem); margin-bottom: 0.75rem;">Appearance</h1>
+  <p style="max-width: 640px; margin: 0 auto; color: rgba(248, 250, 252, 0.75);">
+    Adjust colors, fonts, and section visibility without touching the content settings.
+  </p>
+</div>
+{% endblock %}
+
+{% block content %}
+<section class="grid two-columns">
+  <article class="card">
+    <h2>Theme</h2>
+    <form method="post" class="form-grid">
+      {% if csrf_token %}
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      {% endif %}
+      <input type="hidden" name="action" value="save_appearance" />
+      <div class="swatch-grid">
+        <div class="input-group">
+          <label for="theme_primary">Primary color</label>
+          <input id="theme_primary" name="theme_primary" type="color" value="{{ settings.theme_primary }}" />
+        </div>
+        <div class="input-group">
+          <label for="theme_secondary">Secondary color</label>
+          <input id="theme_secondary" name="theme_secondary" type="color" value="{{ settings.theme_secondary }}" />
+        </div>
+        <div class="input-group">
+          <label for="background_color">Background</label>
+          <input id="background_color" name="background_color" type="color" value="{{ settings.background_color }}" />
+        </div>
+        <div class="input-group">
+          <label for="card_background">Card background</label>
+          <input id="card_background" name="card_background" type="color" value="{{ settings.card_background }}" />
+        </div>
+        <div class="input-group">
+          <label for="text_color">Text color</label>
+          <input id="text_color" name="text_color" type="color" value="{{ settings.text_color }}" />
+        </div>
+      </div>
+      <div class="field-grid">
+        <div class="input-group">
+          <label for="body_font">Body font</label>
+          <select id="body_font" name="body_font">
+            <option value="Manrope, sans-serif" {% if settings.body_font == 'Manrope, sans-serif' %}selected{% endif %}>Manrope</option>
+            <option value="Inter, sans-serif" {% if settings.body_font == 'Inter, sans-serif' %}selected{% endif %}>Inter</option>
+            <option value="system-ui, sans-serif" {% if settings.body_font == 'system-ui, sans-serif' %}selected{% endif %}>System</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="heading_font">Heading font</label>
+          <select id="heading_font" name="heading_font">
+            <option value="Fraunces, serif" {% if settings.heading_font == 'Fraunces, serif' %}selected{% endif %}>Fraunces</option>
+            <option value="Playfair Display, serif" {% if settings.heading_font == 'Playfair Display, serif' %}selected{% endif %}>Playfair Display</option>
+            <option value="Georgia, serif" {% if settings.heading_font == 'Georgia, serif' %}selected{% endif %}>Georgia</option>
+          </select>
+        </div>
+      </div>
+      <button type="submit" class="button">Save appearance</button>
+    </form>
+  </article>
+
+  <article class="card">
+    <h2>Visibility</h2>
+    <p class="section-note">Turn homepage sections on or off without deleting the content itself.</p>
+    <form method="post" class="form-grid">
+      {% if csrf_token %}
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      {% endif %}
+      <input type="hidden" name="action" value="save_appearance" />
+      <div class="input-group">
+        <label for="show_services">Show services</label>
+        <select id="show_services" name="show_services">
+          <option value="1" {% if settings.show_services != '0' %}selected{% endif %}>Visible</option>
+          <option value="0" {% if settings.show_services == '0' %}selected{% endif %}>Hidden</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="show_proof">Show visual proof</label>
+        <select id="show_proof" name="show_proof">
+          <option value="1" {% if settings.show_proof != '0' %}selected{% endif %}>Visible</option>
+          <option value="0" {% if settings.show_proof == '0' %}selected{% endif %}>Hidden</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="show_faqs">Show FAQs</label>
+        <select id="show_faqs" name="show_faqs">
+          <option value="1" {% if settings.show_faqs != '0' %}selected{% endif %}>Visible</option>
+          <option value="0" {% if settings.show_faqs == '0' %}selected{% endif %}>Hidden</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="show_reviews">Show reviews</label>
+        <select id="show_reviews" name="show_reviews">
+          <option value="1" {% if settings.show_reviews != '0' %}selected{% endif %}>Visible</option>
+          <option value="0" {% if settings.show_reviews == '0' %}selected{% endif %}>Hidden</option>
+        </select>
+      </div>
+      <button type="submit" class="button">Save visibility</button>
+    </form>
+  </article>
+</section>
+{% endblock %}

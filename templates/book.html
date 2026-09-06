@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block hero %}
+<section class="page-hero container compact">
+  <h1>Booking</h1>
+</section>
+{% endblock %}
+
+{% block content %}
+{% if next_slot %}
+<section class="card booking-highlight">
+  <div>
+    <h2>Next available</h2>
+    <p class="muted">{{ next_slot.label }} · {{ next_slot.time_label }} · {{ next_slot.technician }}</p>
+  </div>
+  <div class="booking-highlight__actions">
+    <button
+      type="button"
+      class="button secondary"
+      id="select-next-slot"
+      data-date="{{ next_slot.date }}"
+      data-time="{{ next_slot.time_24 }}"
+      data-tech-id="{{ next_slot.technician_id or '' }}">
+      Select next available
+    </button>
+    <a class="button" href="#booking-calendar">View calendar</a>
+  </div>
+</section>
+{% endif %}
+
+{% if slots_by_date %}
+<section class="card availability-card" id="booking-calendar">
+  <div class="section-head compact-head">
+    <div>
+      <h2>Booking calendar</h2>
+    </div>
+  </div>
+  <p class="section-note">Click a time to fill the form below.</p>
+  <div class="calendar-grid">
+    {% for day in slots_by_date %}
+    <div class="calendar-day">
+      <div class="calendar-day__header">
+        <span class="calendar-day__label">{{ day.short_label }}</span>
+        <span class="calendar-day__date">{{ day.label.split(', ')[1] }}</span>
+      </div>
+      <div class="calendar-slots">
+        {% for slot in day.slots %}
+        <button
+          type="button"
+          class="slot-button"
+          data-date="{{ day.date }}"
+          data-time="{{ slot.start_24 }}"
+          data-tech-id="{{ slot.technician_id or '' }}">
+          <span>{{ slot.start }}</span>
+          <span class="muted">{{ slot.technician }}</span>
+        </button>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% else %}
+<section class="card availability-card">
+  <h2>Booking calendar</h2>
+  <p class="section-note">No open times yet. Join the waitlist and we will reach out.</p>
+</section>
+{% endif %}
+<section class="auth-grid auth-grid-single">
+  <article class="form-panel">
+    <form method="post" class="form-grid">
+      {% if csrf_token %}
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      {% endif %}
+      {% if technicians %}
+      <div class="input-group">
+        <label for="technician_id">Technician (optional)</label>
+        <select id="technician_id" name="technician_id">
+          <option value="">Any available</option>
+          {% for tech in technicians %}
+          <option value="{{ tech[0] }}" {% if selected_technician_id and tech[0] == selected_technician_id %}selected{% endif %}>{{ tech[1] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label for="service_id">Service</label>
+        <select id="service_id" name="service_id" required>
+          {% for service in services %}
+          <option value="{{ service[0] }}" {% if selected_service_id and service[0] == selected_service_id %}selected{% endif %}>{{ service[1] }} — ${{ '%.2f'|format(service[2]) }} ({{ service[4] }}m)</option>
+          {% endfor %}
+        </select>
+      </div>
+      {% else %}
+      <div class="input-group">
+        <label for="service_id">Service</label>
+        <select id="service_id" name="service_id" required>
+          {% for service in services %}
+          <option value="{{ service[0] }}" {% if selected_service_id and service[0] == selected_service_id %}selected{% endif %}>{{ service[1] }} — ${{ '%.2f'|format(service[2]) }} ({{ service[4] }}m)</option>
+          {% endfor %}
+        </select>
+      </div>
+      {% endif %}
+      <div class="field-grid">
+        <div class="input-group">
+          <label for="date">Date</label>
+          <input id="date" name="date" type="date" required />
+        </div>
+        <div class="input-group">
+          <label for="time">Time</label>
+          <input id="time" name="time" type="time" min="10:00" max="18:00" step="900" data-minute-steps="0,15,30,45" required />
+        </div>
+      </div>
+      <div class="field-grid">
+        <div class="input-group">
+          <label for="email">Contact email</label>
+          <input id="email" name="email" type="email" placeholder="name@example.com" />
+        </div>
+        <div class="input-group">
+          <label for="phone">Phone</label>
+          <input id="phone" name="phone" type="tel" placeholder="(555) 123-4567" />
+        </div>
+      </div>
+      <div class="input-group">
+        <label class="checkbox"><input type="checkbox" name="create_account" /> Create an account with this email (optional)</label>
+      </div>
+      <div class="input-group">
+        <label for="notes">Notes</label>
+        <textarea id="notes" name="notes" rows="4" placeholder="Anything we should know?"></textarea>
+      </div>
+      <button type="submit" class="button">Confirm booking</button>
+    </form>
+  </article>
+</section>
+
+<section class="card waitlist-card">
+  <h2>Join the waitlist</h2>
+  <form method="post" class="form-grid">
+    {% if csrf_token %}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    {% endif %}
+    <input type="hidden" name="action" value="waitlist" />
+    <div class="field-grid">
+      <div class="input-group">
+        <label for="waitlist_name">Name</label>
+        <input id="waitlist_name" name="name" type="text" placeholder="Your name" />
+      </div>
+      <div class="input-group">
+        <label for="waitlist_email">Email</label>
+        <input id="waitlist_email" name="email" type="email" placeholder="name@example.com" />
+      </div>
+    </div>
+    <div class="field-grid">
+      <div class="input-group">
+        <label for="waitlist_phone">Phone</label>
+        <input id="waitlist_phone" name="phone" type="tel" placeholder="(555) 123-4567" />
+      </div>
+      <div class="input-group">
+        <label for="waitlist_service_id">Service</label>
+        <select id="waitlist_service_id" name="service_id">
+          <option value="">Any service</option>
+          {% for service in services %}
+          <option value="{{ service[0] }}" {% if selected_service_id and service[0] == selected_service_id %}selected{% endif %}>{{ service[1] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="field-grid">
+      <div class="input-group">
+        <label for="waitlist_technician">Technician</label>
+        <select id="waitlist_technician" name="technician_id">
+          <option value="">Any available</option>
+          {% for tech in technicians %}
+          <option value="{{ tech[0] }}" {% if selected_technician_id and tech[0] == selected_technician_id %}selected{% endif %}>{{ tech[1] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="waitlist_date">Preferred date</label>
+        <input id="waitlist_date" name="preferred_date" type="date" />
+      </div>
+    </div>
+    <div class="field-grid">
+      <div class="input-group">
+        <label for="waitlist_time">Preferred time</label>
+          <input id="waitlist_time" name="preferred_time" type="time" step="900" data-minute-steps="0,15,30,45" />
+      </div>
+      <div class="input-group">
+        <label for="waitlist_notes">Notes</label>
+        <input id="waitlist_notes" name="notes" type="text" placeholder="Anything we should know?" />
+      </div>
+    </div>
+    <button type="submit" class="button">Join waitlist</button>
+  </form>
+</section>
+
+<script src="{{ url_for('static', filename='js/booking-calendar.js') }}"></script>
+{% endblock %}

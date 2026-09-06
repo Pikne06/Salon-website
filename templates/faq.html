@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block hero %}
+<section class="page-hero container compact">
+  <h1>FAQ</h1>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="site-section">
+  <div class="container">
+
+    <div class="card">
+      {% if faqs %}
+        <div class="faqs">
+          {% for f in faqs %}
+            <details class="faq-item">
+              <summary><strong>{{ f[1] }}</strong></summary>
+              <div class="faq-answer"><p>{{ f[2] }}</p></div>
+            </details>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p>No FAQs yet. Add them in Admin - Settings.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

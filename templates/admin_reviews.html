@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-4">
+  <h2>Review Moderation</h2>
+  <p>View, remove, or promote user reviews to featured reviews.</p>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Service</th>
+        <th>User</th>
+        <th>Rating</th>
+        <th>Comment</th>
+        <th>When</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in reviews %}
+      <tr>
+        <td>{{ r['id'] }}</td>
+        <td>{% if r['service_id'] %}{{ r['service_id'] }}{% else %}-{% endif %}</td>
+        <td>{{ r['username'] or 'Guest' }}</td>
+        <td>{{ r['rating'] }}</td>
+        <td>{{ r['comment'] }}</td>
+        <td>{{ r['created_at'] }}</td>
+        <td>
+          <form method="post" style="display:inline-block;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="review_id" value="{{ r['id'] }}">
+            <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+          </form>
+          <form method="post" style="display:inline-block; margin-left:6px;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="action" value="feature">
+            <input type="hidden" name="review_id" value="{{ r['id'] }}">
+            <button class="btn btn-sm btn-outline-success" type="submit">Feature</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

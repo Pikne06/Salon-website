@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block hero %}
+<section class="page-hero container compact">
+  <h1>Dashboard</h1>
+</section>
+{% endblock %}
+
+{% block content %}
+<section class="summary-grid">
+  <article class="metric-card">
+    <strong>{{ service_count }}</strong>
+    <span>active services</span>
+  </article>
+  <article class="metric-card">
+    <strong>{{ appointment_count }}</strong>
+    <span>appointments booked</span>
+  </article>
+  <article class="metric-card">
+    <strong>Live</strong>
+    <span>booking workflow</span>
+  </article>
+</section>
+
+<section class="loyalty-card">
+  <div>
+    <span class="eyebrow">Loyalty</span>
+    <h2>Glow-up rewards</h2>
+    <p class="muted">Collect {{ loyalty_total }} visits and earn {{ loyalty_reward }}.</p>
+  </div>
+  <div class="loyalty-card__progress">
+    <div class="loyalty-meter">
+      {% for i in range(1, loyalty_total + 1) %}
+      <span class="loyalty-dot {% if i <= loyalty_completed %}active{% endif %}"></span>
+      {% endfor %}
+    </div>
+    <div class="loyalty-meta">
+      <strong>{{ loyalty_completed }}/{{ loyalty_total }} visits</strong>
+      <span class="muted">{% if loyalty_remaining > 0 %}{{ loyalty_remaining }} to go{% else %}Reward unlocked{% endif %}</span>
+    </div>
+  </div>
+  <a class="button secondary" href="{{ url_for('book') }}">Book next visit</a>
+</section>
+
+<section class="auth-grid dashboard-grid">
+  <article class="surface">
+    <div class="section-head compact-head">
+      <div>
+        <span class="eyebrow">Services</span>
+        <h2>Services ready to book</h2>
+      </div>
+      <a class="button" href="{{ url_for('book') }}">Book appointment</a>
+    </div>
+    {% if services %}
+    <div class="service-list">
+      {% for service in services %}
+      <div class="service-row">
+        <div style="display:flex; gap:0.75rem; align-items:center;">
+          {% if service[3] %}
+          <img src="{{ service[3] }}" class="service-image" alt="{{ service[1] }}" />
+          {% endif %}
+          <div>
+            <strong>{{ service[1] }}</strong>
+            <span>${{ '%.2f'|format(service[2]) }}</span>
+          </div>
+        </div>
+        <span class="chip muted-chip">Available</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p>No services yet. Add one to get started.</p>
+    {% endif %}
+  </article>
+
+  <article class="surface">
+    <div class="section-head compact-head">
+      <div>
+        <span class="eyebrow">Upcoming appointments</span>
+        <h2>Scheduled visits</h2>
+      </div>
+    </div>
+    {% if appointments %}
+    <div class="appointment-list">
+      {% for appt in appointments %}
+      <article class="appointment-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:1rem;">
+          <div>
+            <strong>{{ appt[2] }}</strong>
+            <div class="muted">{{ appt[1].strftime('%B %d, %Y at %I:%M %p') }}</div>
+            <div class="muted">${{ '%.2f'|format(appt[3]) }}{% if appt[4] %} · {{ appt[4] }}m{% endif %}</div>
+            {% if appt[5] %}
+            <div class="muted">Technician: {{ appt[5] }}</div>
+            {% endif %}
+          </div>
+          <div style="min-width:220px;">
+            <form method="post" action="{{ url_for('message_technician') }}">
+              {% if csrf_token %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />{% endif %}
+              <input type="hidden" name="technician_id" value="{{ appt[4] or '' }}" />
+              <label for="msg_{{ appt[0] }}" class="eyebrow">Message technician</label>
+              <textarea id="msg_{{ appt[0] }}" name="message" rows="2" placeholder="I'm running late..." style="width:100%;"></textarea>
+              <button type="submit" class="button" style="margin-top:0.5rem;">Send</button>
+            </form>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p>No appointments yet. Book one to get started.</p>
+    {% endif %}
+  </article>
+</section>
+{% endblock %}

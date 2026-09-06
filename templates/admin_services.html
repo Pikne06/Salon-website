@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block hero %}
+<div>
+  <h1 style="font-size: clamp(2rem, 4vw, 3.25rem); margin-bottom: 0.75rem;">Manage services</h1>
+</div>
+{% endblock %}
+
+{% block content %}
+<details class="card admin-disclosure">
+  <summary>
+    <span>Add a service</span>
+    <span class="summary-note">Name, pricing, duration, and image choices</span>
+  </summary>
+  <div class="disclosure-body">
+    <form method="post" class="form-grid" enctype="multipart/form-data">
+      {% if csrf_token %}
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      {% endif %}
+      <input type="hidden" name="action" value="add" />
+      <div class="field-grid">
+        <div class="input-group">
+          <label for="name">Name</label>
+          <input id="name" name="name" type="text" required />
+        </div>
+        <div class="input-group">
+          <label for="price">Price</label>
+          <input id="price" name="price" type="number" step="0.01" min="0" required />
+        </div>
+      </div>
+      <div class="field-grid">
+        <div class="input-group">
+          <label for="duration">Duration (minutes)</label>
+          <input id="duration" name="duration" type="number" step="5" min="15" value="60" />
+        </div>
+        <div class="input-group">
+          <label for="image_url">Image URL</label>
+          <input id="image_url" name="image_url" type="url" placeholder="https://..." />
+        </div>
+      </div>
+      <div class="input-group">
+        <label for="image_file">Image file</label>
+        <input id="image_file" name="image_file" type="file" accept="image/*" />
+      </div>
+      <div class="input-group">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" rows="3" placeholder="Short overview for the service page"></textarea>
+      </div>
+      <div class="input-group">
+        <label for="includes_text">Includes</label>
+        <textarea id="includes_text" name="includes_text" rows="3" placeholder="What is included"></textarea>
+      </div>
+      <div class="input-group">
+        <label for="aftercare_text">Aftercare</label>
+        <textarea id="aftercare_text" name="aftercare_text" rows="3" placeholder="Recommended aftercare"></textarea>
+      </div>
+      <div class="settings-actions">
+        <a class="button secondary" href="{{ url_for('manage_technicians') }}">Manage technicians</a>
+        <button type="submit" class="button">Add service</button>
+      </div>
+    </form>
+  </div>
+</details>
+
+<section class="card" style="margin-top:1.5rem;">
+  <h2>Current catalog</h2>
+  {% if services %}
+  <ul class="service-list">
+    {% for service in services %}
+    <li class="service-row service-row--stack">
+      <div class="service-row__top">
+        <div>
+          <strong>{{ service[1] }}</strong>
+          <div style="color: var(--muted);">${{ '%.2f'|format(service[2]) }} · {{ service[4] }}m</div>
+        </div>
+        <form method="post">
+          {% if csrf_token %}
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          {% endif %}
+          <input type="hidden" name="action" value="remove" />
+          <input type="hidden" name="service_id" value="{{ service[0] }}" />
+          <button type="submit" class="button secondary">Remove</button>
+        </form>
+      </div>
+      <details class="service-edit">
+        <summary>Edit details</summary>
+        <form method="post" class="form-grid">
+          {% if csrf_token %}
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          {% endif %}
+          <input type="hidden" name="action" value="update" />
+          <input type="hidden" name="service_id" value="{{ service[0] }}" />
+          <div class="input-group">
+            <label for="description_{{ service[0] }}">Description</label>
+            <textarea id="description_{{ service[0] }}" name="description" rows="3">{{ service[5] or '' }}</textarea>
+          </div>
+          <div class="input-group">
+            <label for="includes_{{ service[0] }}">Includes</label>
+            <textarea id="includes_{{ service[0] }}" name="includes_text" rows="3">{{ service[6] or '' }}</textarea>
+          </div>
+          <div class="input-group">
+            <label for="aftercare_{{ service[0] }}">Aftercare</label>
+            <textarea id="aftercare_{{ service[0] }}" name="aftercare_text" rows="3">{{ service[7] or '' }}</textarea>
+          </div>
+          <button type="submit" class="button">Save details</button>
+        </form>
+      </details>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>No services yet. Add your first offering above.</p>
+  {% endif %}
+</section>
+
+
+<details class="card admin-disclosure" style="margin-top:1.5rem;">
+  <summary>
+    <span>Upload service photos</span>
+    <span class="summary-note">Gallery images for the service detail page</span>
+  </summary>
+  <div class="disclosure-body">
+    <form method="post" class="form-grid" enctype="multipart/form-data">
+      {% if csrf_token %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />{% endif %}
+      <input type="hidden" name="action" value="add_photos" />
+      <div class="input-group">
+        <label for="photo_service_id">Service</label>
+        <select id="photo_service_id" name="service_id" required>
+          {% for service in services %}
+          <option value="{{ service[0] }}">{{ service[1] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="photo_technician_id">Technician (optional)</label>
+        <select id="photo_technician_id" name="technician_id">
+          <option value="">Unassigned</option>
+          {% for tech in technicians %}
+          <option value="{{ tech[0] }}">{{ tech[1] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="photos">Photos</label>
+        <input id="photos" name="photos" type="file" accept="image/*" multiple />
+      </div>
+      <div class="input-group">
+        <label for="caption">Caption</label>
+        <input id="caption" name="caption" type="text" placeholder="Before / after" />
+      </div>
+      <button type="submit" class="button">Upload photos</button>
+    </form>
+  </div>
+</details>
+{% endblock %}

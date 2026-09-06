@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block hero %}
+<section class="page-hero container compact">
+  <h1>{{ stylist.name }}</h1>
+  <p class="section-note">{{ stylist.title or 'Stylist' }}</p>
+</section>
+{% endblock %}
+
+{% block content %}
+<section class="section container">
+  <div class="stylist-profile-grid">
+    <article class="card stylist-profile-card">
+      <div class="stylist-profile__media">
+        {% if stylist.photo_url %}
+        <img src="{{ stylist.photo_url }}" alt="{{ stylist.name }}" />
+        {% else %}
+        <div class="stylist-placeholder"></div>
+        {% endif %}
+      </div>
+    </article>
+    <article class="card stylist-profile-card">
+      <h2>About {{ stylist.name }}</h2>
+      {% if stylist.bio %}
+      <p class="muted">{{ stylist.bio }}</p>
+      {% else %}
+      <p class="muted">A dedicated stylist focused on detail, comfort, and long-lasting results.</p>
+      {% endif %}
+
+      {% if stylist.specialties %}
+      <div class="tag-list">
+        {% for tag in stylist.specialties.split(',') %}
+          {% set clean = tag.strip() %}
+          {% if clean %}<span class="tag">{{ clean }}</span>{% endif %}
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="stylist-contact">
+        {% if stylist.email %}<div><strong>Email:</strong> {{ stylist.email }}</div>{% endif %}
+        {% if stylist.phone %}<div><strong>Phone:</strong> {{ stylist.phone }}</div>{% endif %}
+      </div>
+
+      <div class="stylist-profile__actions">
+        <a class="button" href="{{ url_for('book') }}?technician_id={{ stylist.id }}">Book with {{ stylist.name }}</a>
+        <a class="button secondary" href="{{ url_for('services_page') }}">Explore services</a>
+      </div>
+    </article>
+  </div>
+</section>
+{% endblock %}

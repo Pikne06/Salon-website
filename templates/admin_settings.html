@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block hero %}
+<div>
+  <h1 style="font-size: clamp(2rem, 4vw, 3.25rem); margin-bottom: 0.75rem;">Site settings</h1>
+</div>
+{% endblock %}
+
+{% block content %}
+<details class="card admin-disclosure">
+  <summary>
+    <span>General content</span>
+    <span class="summary-note">Location, hours, contact, policy, socials</span>
+  </summary>
+  <div class="disclosure-body">
+    <form method="post" class="form-grid">
+      {% if csrf_token %}
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      {% endif %}
+      <input type="hidden" name="action" value="save_general" />
+      <div class="field-grid">
+        <div class="input-group">
+          <label for="business_name">Business name</label>
+          <input id="business_name" name="business_name" type="text" value="{{ settings.business_name }}" />
+        </div>
+        <div class="input-group">
+          <label for="address">Location</label>
+          <input id="address" name="address" type="text" value="{{ settings.address }}" />
+        </div>
+      </div>
+      <div class="field-grid">
+        <div class="input-group">
+          <label for="maps_url">Google Maps link</label>
+          <input id="maps_url" name="maps_url" type="url" value="{{ settings.maps_url }}" />
+        </div>
+        <div class="input-group">
+          <label for="phone">Phone</label>
+          <input id="phone" name="phone" type="text" value="{{ settings.phone }}" />
+        </div>
+      </div>
+      <div class="field-grid">
+        <div class="input-group">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" value="{{ settings.email }}" />
+        </div>
+        <div class="input-group">
+          <label for="hours_text">Business hours</label>
+          <textarea id="hours_text" name="hours_text" rows="3">{{ settings.hours_text }}</textarea>
+        </div>
+      </div>
+      <div class="field-grid">
+        <div class="input-group">
+          <label for="cancellation_policy">Cancellation policy</label>
+          <textarea id="cancellation_policy" name="cancellation_policy" rows="3">{{ settings.cancellation_policy }}</textarea>
+        </div>
+        <div class="input-group">
+          <label for="parking_note">Parking note</label>
+          <input id="parking_note" name="parking_note" type="text" value="{{ settings.parking_note }}" />
+        </div>
+      </div>
+      <div class="field-grid">
+        <div class="input-group">
+          <label for="accessibility_note">Accessibility note</label>
+          <input id="accessibility_note" name="accessibility_note" type="text" value="{{ settings.accessibility_note }}" />
+        </div>
+        <div class="input-group">
+          <label for="instagram_url">Instagram URL</label>
+          <input id="instagram_url" name="instagram_url" type="url" value="{{ settings.instagram_url }}" />
+        </div>
+      </div>
+      <div class="field-grid">
+        <div class="input-group">
+          <label for="facebook_url">Facebook URL</label>
+          <input id="facebook_url" name="facebook_url" type="url" value="{{ settings.facebook_url }}" />
+        </div>
+        <div class="input-group">
+          <label for="tiktok_url">TikTok URL</label>
+          <input id="tiktok_url" name="tiktok_url" type="url" value="{{ settings.tiktok_url }}" />
+        </div>
+      </div>
+      <button type="submit" class="button">Save settings</button>
+    </form>
+  </div>
+</details>
+
+<details class="card admin-disclosure" style="margin-top:1.5rem;">
+  <summary>
+    <span>FAQ</span>
+    <span class="summary-note">Add new questions or edit existing answers</span>
+  </summary>
+  <div class="disclosure-body">
+    <form method="post" class="form-grid">
+      {% if csrf_token %}
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      {% endif %}
+      <input type="hidden" name="action" value="add_faq" />
+      <div class="field-grid">
+        <div class="input-group">
+          <label for="question">Question</label>
+          <input id="question" name="question" type="text" required />
+        </div>
+        <div class="input-group">
+          <label for="faq_sort_order">Sort order</label>
+          <input id="faq_sort_order" name="sort_order" type="number" value="0" />
+        </div>
+      </div>
+      <div class="input-group">
+        <label for="answer">Answer</label>
+        <textarea id="answer" name="answer" rows="4" required></textarea>
+      </div>
+      <button type="submit" class="button">Add FAQ</button>
+    </form>
+
+    <div style="margin-top: 1.25rem; display: grid; gap: 0.75rem;">
+      {% for faq in faqs %}
+      <form method="post" class="settings-card">
+        {% if csrf_token %}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        {% endif %}
+        <input type="hidden" name="faq_id" value="{{ faq.id }}" />
+        <input type="hidden" name="action" value="update_faq" />
+        <div style="flex: 1; display: grid; gap: 0.75rem;">
+          <div class="field-grid">
+            <div class="input-group">
+              <label>Question</label>
+              <input name="question" type="text" value="{{ faq.question }}" />
+            </div>
+            <div class="input-group">
+              <label>Sort order</label>
+              <input name="sort_order" type="number" value="{{ faq.sort_order }}" />
+            </div>
+          </div>
+          <div class="input-group">
+            <label>Answer</label>
+            <textarea name="answer" rows="3">{{ faq.answer }}</textarea>
+          </div>
+        </div>
+        <div class="settings-actions">
+          <button type="submit" class="button">Save</button>
+        </div>
+      </form>
+      <form method="post" class="settings-card">
+        {% if csrf_token %}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        {% endif %}
+        <input type="hidden" name="action" value="remove_faq" />
+        <input type="hidden" name="faq_id" value="{{ faq.id }}" />
+        <strong>{{ faq.question }}</strong>
+        <button type="submit" class="button secondary">Remove</button>
+      </form>
+      {% endfor %}
+    </div>
+  </div>
+</details>
+
+<details class="card admin-disclosure" style="margin-top:1.5rem;">
+  <summary>
+    <span>Reviews</span>
+    <span class="summary-note">Add featured testimonials for the homepage</span>
+  </summary>
+  <div class="disclosure-body">
+    <form method="post" class="form-grid">
+      {% if csrf_token %}
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      {% endif %}
+      <input type="hidden" name="action" value="add_review" />
+      <div class="field-grid">
+        <div class="input-group">
+          <label for="name">Name</label>
+          <input id="name" name="name" type="text" required />
+        </div>
+        <div class="input-group">
+          <label for="role">Role</label>
+          <input id="role" name="role" type="text" placeholder="Studio owner" />
+        </div>
+      </div>
+      <div class="field-grid">
+        <div class="input-group">
+          <label for="review_sort_order">Sort order</label>
+          <input id="review_sort_order" name="sort_order" type="number" value="0" />
+        </div>
+        <div class="input-group">
+          <label for="quote">Quote</label>
+          <textarea id="quote" name="quote" rows="4" required></textarea>
+        </div>
+      </div>
+      <button type="submit" class="button">Add review</button>
+    </form>
+
+    <div style="margin-top: 1.25rem; display: grid; gap: 0.75rem;">
+      {% for review in featured_reviews %}
+      <form method="post" class="settings-card">
+        {% if csrf_token %}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        {% endif %}
+        <input type="hidden" name="review_id" value="{{ review.id }}" />
+        <input type="hidden" name="action" value="update_review" />
+        <div style="flex: 1; display: grid; gap: 0.75rem;">
+          <div class="field-grid">
+            <div class="input-group">
+              <label>Name</label>
+              <input name="name" type="text" value="{{ review.name }}" />
+            </div>
+            <div class="input-group">
+              <label>Role</label>
+              <input name="role" type="text" value="{{ review.role or '' }}" />
+            </div>
+          </div>
+          <div class="field-grid">
+            <div class="input-group">
+              <label>Sort order</label>
+              <input name="sort_order" type="number" value="{{ review.sort_order }}" />
+            </div>
+            <div class="input-group">
+              <label>Quote</label>
+              <textarea name="quote" rows="3">{{ review.quote }}</textarea>
+            </div>
+          </div>
+        </div>
+        <div class="settings-actions">
+          <button type="submit" class="button">Save</button>
+        </div>
+      </form>
+      <form method="post" class="settings-card">
+        {% if csrf_token %}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        {% endif %}
+        <input type="hidden" name="action" value="remove_review" />
+        <input type="hidden" name="review_id" value="{{ review.id }}" />
+        <strong>{{ review.name }}</strong>
+        <button type="submit" class="button secondary">Remove</button>
+      </form>
+      {% endfor %}
+    </div>
+  </div>
+</details>
+{% endblock %}

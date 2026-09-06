@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block hero %}
+<section class="page-hero container compact">
+  <h1>Technicians</h1>
+</section>
+{% endblock %}
+
+{% block content %}
+<section class="grid two-columns">
+  <article class="card">
+    <h2>Add technician</h2>
+    <form method="post" class="form-grid">
+      {% if csrf_token %}
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      {% endif %}
+      <input type="hidden" name="action" value="add" />
+      <div class="input-group">
+        <label for="name">Name</label>
+        <input id="name" name="name" type="text" required />
+      </div>
+      <div class="input-group">
+        <label for="email">Email (optional)</label>
+        <input id="email" name="email" type="email" />
+      </div>
+      <div class="input-group">
+        <label for="phone">Phone (optional)</label>
+        <input id="phone" name="phone" type="tel" />
+      </div>
+      <div class="input-group">
+        <label for="title">Title (optional)</label>
+        <input id="title" name="title" type="text" placeholder="Senior stylist" />
+      </div>
+      <div class="input-group">
+        <label for="specialties">Specialties (optional)</label>
+        <input id="specialties" name="specialties" type="text" placeholder="Color, balayage, extensions" />
+      </div>
+      <div class="input-group">
+        <label for="photo_url">Photo URL (optional)</label>
+        <input id="photo_url" name="photo_url" type="url" placeholder="https://..." />
+      </div>
+      <div class="input-group">
+        <label for="bio">Bio (optional)</label>
+        <textarea id="bio" name="bio" rows="3" placeholder="Short stylist intro"></textarea>
+      </div>
+      <div class="field-grid">
+        <div class="input-group">
+          <label for="work_start">Work start</label>
+          <input id="work_start" name="work_start" type="time" value="10:00" step="900" data-minute-steps="0,15,30,45" />
+        </div>
+        <div class="input-group">
+          <label for="work_end">Work end</label>
+          <input id="work_end" name="work_end" type="time" value="18:00" step="900" data-minute-steps="0,15,30,45" />
+        </div>
+      </div>
+      <button type="submit" class="button">Add technician</button>
+    </form>
+  </article>
+
+  <article class="card">
+    <h2>Current staff</h2>
+    {% if technicians %}
+    <ul class="tech-list">
+      {% for tech in technicians %}
+      <li class="tech-row">
+        <form method="post" class="form-grid tech-form">
+          {% if csrf_token %}
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          {% endif %}
+          <input type="hidden" name="action" value="update" />
+          <input type="hidden" name="technician_id" value="{{ tech[0] }}" />
+          <div class="field-grid">
+            <div class="input-group">
+              <label for="name_{{ tech[0] }}">Name</label>
+              <input id="name_{{ tech[0] }}" name="name" type="text" value="{{ tech[1] }}" required />
+            </div>
+            <div class="input-group">
+              <label for="title_{{ tech[0] }}">Title</label>
+              <input id="title_{{ tech[0] }}" name="title" type="text" value="{{ tech[4] or '' }}" />
+            </div>
+          </div>
+          <div class="field-grid">
+            <div class="input-group">
+              <label for="email_{{ tech[0] }}">Email</label>
+              <input id="email_{{ tech[0] }}" name="email" type="email" value="{{ tech[2] or '' }}" />
+            </div>
+            <div class="input-group">
+              <label for="phone_{{ tech[0] }}">Phone</label>
+              <input id="phone_{{ tech[0] }}" name="phone" type="tel" value="{{ tech[3] or '' }}" />
+            </div>
+          </div>
+          <div class="input-group">
+            <label for="specialties_{{ tech[0] }}">Specialties</label>
+            <input id="specialties_{{ tech[0] }}" name="specialties" type="text" value="{{ tech[5] or '' }}" />
+          </div>
+          <div class="input-group">
+            <label for="photo_{{ tech[0] }}">Photo URL</label>
+            <input id="photo_{{ tech[0] }}" name="photo_url" type="url" value="{{ tech[7] or '' }}" />
+          </div>
+          <div class="input-group">
+            <label for="bio_{{ tech[0] }}">Bio</label>
+            <textarea id="bio_{{ tech[0] }}" name="bio" rows="3">{{ tech[6] or '' }}</textarea>
+          </div>
+          <div class="tech-actions">
+            <button type="submit" class="button">Save changes</button>
+          </div>
+        </form>
+        <form method="post" class="tech-remove">
+          {% if csrf_token %}
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          {% endif %}
+          <input type="hidden" name="action" value="remove" />
+          <input type="hidden" name="technician_id" value="{{ tech[0] }}" />
+          <button type="submit" class="button secondary">Remove</button>
+        </form>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>No technicians yet.</p>
+    {% endif %}
+  </article>
+</section>
+
+<section class="grid two-columns" style="margin-top:1.5rem;">
+  <article class="card">
+    <h2>Weekday availability</h2>
+    <form method="post" class="form-grid">
+      {% if csrf_token %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />{% endif %}
+      <input type="hidden" name="action" value="save_availability" />
+      <div class="input-group">
+        <label for="availability_technician_id">Technician</label>
+        <select id="availability_technician_id" name="technician_id" required>
+          {% for tech in technicians %}
+          <option value="{{ tech[0] }}">{{ tech[1] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="field-grid">
+        <div class="input-group">
+          <label for="weekday">Weekday</label>
+          <select id="weekday" name="weekday">
+            <option value="0">Monday</option>
+            <option value="1">Tuesday</option>
+            <option value="2">Wednesday</option>
+            <option value="3">Thursday</option>
+            <option value="4">Friday</option>
+            <option value="5">Saturday</option>
+            <option value="6">Sunday</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="is_closed">Closed</label>
+          <select id="is_closed" name="is_closed">
+            <option value="0">Open</option>
+            <option value="1">Closed</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-grid">
+        <div class="input-group">
+          <label for="start_time">Start</label>
+          <input id="start_time" name="start_time" type="time" value="10:00" step="900" data-minute-steps="0,15,30,45" />
+        </div>
+        <div class="input-group">
+          <label for="end_time">End</label>
+          <input id="end_time" name="end_time" type="time" value="18:00" step="900" data-minute-steps="0,15,30,45" />
+        </div>
+      </div>
+      <button type="submit" class="button">Save availability</button>
+    </form>
+  </article>
+
+  <article class="card">
+    <h2>Vacation block</h2>
+    <form method="post" class="form-grid">
+      {% if csrf_token %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />{% endif %}
+      <input type="hidden" name="action" value="add_vacation" />
+      <div class="input-group">
+        <label for="vacation_technician_id">Technician</label>
+        <select id="vacation_technician_id" name="technician_id" required>
+          {% for tech in technicians %}
+          <option value="{{ tech[0] }}">{{ tech[1] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="field-grid">
+        <div class="input-group">
+          <label for="start_date">Start date</label>
+          <input id="start_date" name="start_date" type="date" required />
+        </div>
+        <div class="input-group">
+          <label for="end_date">End date</label>
+          <input id="end_date" name="end_date" type="date" required />
+        </div>
+      </div>
+      <div class="input-group">
+        <label for="reason">Reason</label>
+        <input id="reason" name="reason" type="text" placeholder="Vacation" />
+      </div>
+      <button type="submit" class="button">Add vacation</button>
+    </form>
+  </article>
+</section>
+
+<section class="card" style="margin-top:1.5rem;">
+  <h2>Scheduled time off</h2>
+  {% if vacations %}
+  <ul style="list-style:none; padding:0; display:grid; gap:0.75rem;">
+    {% for vac in vacations %}
+    <li style="display:flex; justify-content:space-between; gap:1rem; padding:0.9rem 1rem; border-radius:0.85rem; background:var(--card-bg);">
+      <div>
+        <strong>{{ vac[1] }}</strong>
+        <div class="muted">{{ vac[2] }} → {{ vac[3] }}{% if vac[4] %} · {{ vac[4] }}{% endif %}</div>
+      </div>
+      <form method="post">
+        {% if csrf_token %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />{% endif %}
+        <input type="hidden" name="action" value="remove_vacation" />
+        <input type="hidden" name="vacation_id" value="{{ vac[0] }}" />
+        <button type="submit" class="button secondary">Remove</button>
+      </form>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>No vacation blocks yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

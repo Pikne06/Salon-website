@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block hero %}
+<section class="landing-hero left">
+  <div class="landing-hero__bg" style="background-image: url('{{ url_for('static', filename='hairsal/images/hero_bg_1.jpg') }}');"></div>
+  <div class="landing-hero__overlay"></div>
+  <div class="landing-hero__content container">
+    <h1>Softly styled hair, ready for real life.</h1>
+    <div class="hero-actions hero-cta-group">
+      <a href="{{ url_for('book') }}" class="btn btn-black hero-cta">Book now</a>
+      <a href="{{ url_for('services_page') }}" class="button secondary">Services</a>
+      <a href="#pricing" class="button secondary ghost">Gift cards</a>
+    </div>
+    <p class="hero-note muted">No account required to book.</p>
+  </div>
+</section>
+{% endblock %}
+
+{% block content %}
+  {% if next_slots %}
+  <section class="availability-strip">
+    <div class="container availability-strip__inner">
+      <div class="availability-strip__copy">
+        <span class="eyebrow">Next openings</span>
+        <h2>Fresh availability this week.</h2>
+        <p class="muted">Grab a spot while it is still open or jump to the full calendar.</p>
+      </div>
+      <div class="availability-strip__slots">
+        {% for slot in next_slots %}
+        <a class="slot-pill" href="{{ url_for('book', technician_id=slot.technician_id) }}#booking-calendar">
+          <span class="slot-pill__date">{{ slot.label }}</span>
+          <span class="slot-pill__time">{{ slot.time }}</span>
+          <span class="slot-pill__tech">{{ slot.technician }}</span>
+        </a>
+        {% endfor %}
+        <a class="slot-pill slot-pill--action" href="{{ url_for('book') }}">See all openings</a>
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  {% if trust_items %}
+  <section class="trust-strip">
+    <div class="container trust-strip__inner">
+      <span class="eyebrow">Trusted care</span>
+      <div class="trust-strip__items">
+        {% for item in trust_items %}
+        <span class="trust-chip">{{ item }}</span>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  <div class="site-section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6 col-lg-4 text-center">
+          <h3 class="line-height-1 mb-3"><span class="d-block display-4 line-height-1 text-black">Where calm meets</span> <span class="d-block display-4 line-height-1"><em class="text-primary font-weight-bold">craft.</em></span></h3>
+          <p><a href="{{ url_for('gallery') }}" class="small text-uppercase font-weight-bold">See the gallery</a></p>
+        </div>
+        <div class="col-md-6 col-lg-4">
+          <figure class="h-100 hover-bg-enlarge">
+            <div class="bg-image h-100 bg-image-md-height" style="background-image: url('{{ url_for('static', filename='hairsal/images/img_2.jpg') }}');"></div>
+          </figure>
+        </div>
+        <div class="col-md-6 col-lg-4">
+          <div class="border p-4 d-flex align-items-center justify-content-center h-100">
+            <div class="text-center">
+              <h2 class="text-primary h2 mb-5">Studio hours</h2>
+              <p class="mb-4"><span class="d-block font-weight-bold">When we're in</span> {{ site_settings.hours_text if site_settings else '' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if site_settings.show_services != '0' %}
+  <div class="site-section">
+    <div class="container">
+      <div class="row justify-content-center mb-5">
+        <div class="col-md-7">
+          <h2 class="site-section-heading font-weight-light text-black text-center">Signature services</h2>
+        </div>
+      </div>
+      <div class="row">
+        {% for s in showcase_services %}
+        <div class="col-md-6 col-lg-4 text-center mb-5 mb-lg-5">
+          <div class="h-100 p-4 p-lg-5 bg-light site-block-feature-7">
+            <span class="icon flaticon-razor display-3 text-primary mb-4 d-block"></span>
+            <h3 class="text-black h4">{{ s.name }}</h3>
+            <p>{{ s.duration }}-minute session</p>
+            <p><strong class="font-weight-bold text-primary">${{ '%.2f'|format(s.price) }}</strong></p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="site-section bg-light">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 mb-5">
+          <img src="{{ url_for('static', filename='hairsal/images/person_1.jpg') }}" alt="Image" class="img-md-fluid">
+        </div>
+        <div class="col-lg-6 bg-white p-md-5 align-self-center">
+          <h2 class="display-1 text-black line-height-1 site-section-heading mb-4 pb-3">Refresh, without the rush.</h2>
+          <p class="text-black lead"><em>Cuts, color, and care that feel clean, modern, and effortless.</em></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

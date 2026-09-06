@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block hero %}
+<section class="page-hero container compact">
+  <h1>Create your account in minutes.</h1>
+</section>
+{% endblock %}
+
+{% block content %}
+<section class="auth-grid">
+  <article class="surface support-panel">
+    <span class="eyebrow">What you get</span>
+    <h2>A refined experience with an easy flow.</h2>
+    <ul class="panel-list dark">
+      <li><span class="dot"></span><div><strong>Calm, luxury feel</strong><span>Every screen feels intentional without being fussy.</span></div></li>
+      <li><span class="dot"></span><div><strong>Easy updates</strong><span>Change services, prices, and details without a rebuild.</span></div></li>
+      <li><span class="dot"></span><div><strong>Guest-friendly flow</strong><span>Book quickly, then keep the experience casual and clear.</span></div></li>
+    </ul>
+  </article>
+
+  <article class="form-panel">
+    <h2>Create your account</h2>
+    <form method="post" class="form-grid">
+      {% if csrf_token %}
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      {% endif %}
+      <div class="field-grid">
+        <div class="input-group">
+          <label for="username">Username</label>
+          <input id="username" name="username" type="text" required />
+        </div>
+        <div class="input-group">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" required />
+        </div>
+      </div>
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" required />
+        <small class="field-hint">Use at least 8 characters with uppercase, number, and symbol.</small>
+      </div>
+      <button type="submit" class="button">Create account</button>
+    </form>
+  </article>
+</section>
+{% endblock %}

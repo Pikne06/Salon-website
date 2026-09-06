@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block hero %}
+<section class="page-hero container compact">
+  <h1>Upcoming free times</h1>
+</section>
+{% endblock %}
+
+{% block content %}
+<section class="grid two-columns">
+  <article class="card">
+    <h2>Add availability</h2>
+    <form method="post" class="form-grid">
+      {% if csrf_token %}
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      {% endif %}
+      <input type="hidden" name="action" value="add_slot" />
+      <div class="input-group">
+        <label for="technician_id">Technician</label>
+        <select id="technician_id" name="technician_id" required>
+          {% for tech in technicians %}
+          <option value="{{ tech[0] }}">{{ tech[1] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="field-grid">
+        <div class="input-group">
+          <label for="slot_date">Date</label>
+          <input id="slot_date" name="slot_date" type="date" required />
+        </div>
+        <div class="input-group">
+          <label for="slot_time">Start time</label>
+          <input id="slot_time" name="slot_time" type="time" step="900" data-minute-steps="0,15,30,45" required />
+        </div>
+      </div>
+      <div class="input-group">
+        <label for="duration">Duration (minutes)</label>
+        <input id="duration" name="duration" type="number" min="15" step="5" value="60" />
+      </div>
+      <button type="submit" class="button">Add slot</button>
+    </form>
+  </article>
+
+  <article class="card">
+    <h2>Recurring slots</h2>
+    <form method="post" class="form-grid">
+      {% if csrf_token %}
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      {% endif %}
+      <input type="hidden" name="action" value="add_recurring" />
+      <div class="input-group">
+        <label for="recurring_technician_id">Technician</label>
+        <select id="recurring_technician_id" name="technician_id" required>
+          {% for tech in technicians %}
+          <option value="{{ tech[0] }}">{{ tech[1] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="field-grid">
+        <div class="input-group">
+          <label for="recurring_start_date">Start date</label>
+          <input id="recurring_start_date" name="start_date" type="date" required />
+        </div>
+        <div class="input-group">
+          <label for="recurring_end_date">End date</label>
+          <input id="recurring_end_date" name="end_date" type="date" required />
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Weekdays</label>
+        <div class="weekday-grid">
+          <label class="weekday-option"><input type="checkbox" name="weekdays" value="0" /> Mon</label>
+          <label class="weekday-option"><input type="checkbox" name="weekdays" value="1" /> Tue</label>
+          <label class="weekday-option"><input type="checkbox" name="weekdays" value="2" /> Wed</label>
+          <label class="weekday-option"><input type="checkbox" name="weekdays" value="3" /> Thu</label>
+          <label class="weekday-option"><input type="checkbox" name="weekdays" value="4" /> Fri</label>
+          <label class="weekday-option"><input type="checkbox" name="weekdays" value="5" /> Sat</label>
+          <label class="weekday-option"><input type="checkbox" name="weekdays" value="6" /> Sun</label>
+        </div>
+      </div>
+      <div class="input-group">
+        <label for="recurring_start_time">Start time</label>
+        <input id="recurring_start_time" name="start_time" type="time" step="900" data-minute-steps="0,15,30,45" required />
+      </div>
+      <div class="input-group">
+        <label for="recurring_duration">Duration (minutes)</label>
+        <input id="recurring_duration" name="duration" type="number" min="15" step="5" value="60" />
+      </div>
+      <button type="submit" class="button">Add recurring slots</button>
+      <p class="muted" style="margin:0;">Recurring slots skip times that already exist.</p>
+    </form>
+  </article>
+</section>
+
+<section class="card" style="margin-top:1.5rem;">
+  <h2>Upcoming slots</h2>
+  {% if slots_by_date %}
+    {% for day in slots_by_date %}
+      <div class="slot-day">
+        <h3>{{ day.label }}</h3>
+        <div class="slot-list">
+          {% for slot in day.slots %}
+            <div class="slot-row">
+              <div class="slot-main">
+                <strong>{{ slot.start }} - {{ slot.end }}</strong>
+                <span class="muted">{{ slot.technician }}</span>
+                {% if slot.is_booked %}
+                <span class="muted">Booked{% if slot.booked_by %} · {{ slot.booked_by }}{% endif %}</span>
+                {% else %}
+                <span class="muted">Open</span>
+                {% endif %}
+              </div>
+              <div class="slot-actions">
+                {% if slot.is_booked %}
+                <form method="post">
+                  {% if csrf_token %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />{% endif %}
+                  <input type="hidden" name="action" value="mark_open" />
+                  <input type="hidden" name="slot_id" value="{{ slot.id }}" />
+                  <button type="submit" class="button secondary">Mark open</button>
+                </form>
+                {% endif %}
+                <form method="post">
+                  {% if csrf_token %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />{% endif %}
+                  <input type="hidden" name="action" value="remove_slot" />
+                  <input type="hidden" name="slot_id" value="{{ slot.id }}" />
+                  <button type="submit" class="button secondary">Remove</button>
+                </form>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>No slots yet. Add your first availability above.</p>
+  {% endif %}
+</section>
+{% endblock %}
