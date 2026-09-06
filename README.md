@@ -1,7 +1,7 @@
 
 # Salon Booking Website
 
-A Flask-based appointment booking web application for a nail, hairstylist, or barber salon. It handles client-facing booking and account management, plus a full admin panel for running the business side of the salon. Ships pre-configured as a demo salon ("Auraline Salon") — the business name, contact info, colors, and fonts are all editable from the admin panel without touching code.
+A Flask-based appointment booking web application for a nail, hairstylist, or barber salon. It handles client-facing booking and account management, plus a full admin panel for running the business side of the salon. Ships pre-configured as a demo salon ("Auraline Salon") - the business name, contact info, colors, and fonts are all editable from the admin panel without touching code.
 
 ## Features
 
@@ -13,15 +13,15 @@ A Flask-based appointment booking web application for a nail, hairstylist, or ba
 - Contact form (`/contact`) and FAQ page (`/faq`)
 
 **For admins** (all under `/admin/...`)
-- `services` — manage services: pricing, duration, description, images, aftercare info
-- `technicians` — manage stylist profiles
-- `availability` — set weekday schedules and vacation blocks per technician
-- `appearance` — site colors, fonts, and layout toggles (services/FAQs/reviews sections on/off)
-- `settings` — business name, address, hours, social links, cancellation policy
-- `gallery` — manage gallery photos
-- `reviews` — manage/moderate reviews
-- `waitlist` — view and manage waitlist requests
-- `reports` — booking reports, with CSV export (`/admin/export.csv`)
+- `services` - manage services: pricing, duration, description, images, aftercare info
+- `technicians` - manage stylist profiles
+- `availability` - set weekday schedules and vacation blocks per technician
+- `appearance` - site colors, fonts, and layout toggles (services/FAQs/reviews sections on/off)
+- `settings` - business name, address, hours, social links, cancellation policy
+- `gallery` - manage gallery photos
+- `reviews` - manage/moderate reviews
+- `waitlist` - view and manage waitlist requests
+- `reports` - booking reports, with CSV export (`/admin/export.csv`)
 
 **Under the hood**
 - CSRF protection on all state-changing requests (session-bound token, validated in `before_request`)
@@ -97,4 +97,4 @@ On first run, an admin account is seeded automatically:
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT - see [LICENSE](LICENSE).
